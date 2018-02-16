@@ -5,8 +5,9 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const blogsRouter = require('./controllers/blogs')
 const mongoose = require('mongoose')
+const config = require('./config')
 
-const mongoUrl = 'mongodb://@ds237868.mlab.com:37868/blogs'
+const mongoUrl = 'mongodb://' + config.vars.dbU + ':' + config.vars.dbP + '@ds237868.mlab.com:37868/blogs'
 mongoose.connect(mongoUrl)
 mongoose.Promise = global.Promise
 
