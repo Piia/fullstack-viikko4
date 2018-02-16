@@ -4,9 +4,9 @@
   "description": "Blog-application",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "watch": "nodemon index.js",
-    "test": "jest --verbose"
+    "start": "cross-env NODE_ENV=production node index.js",
+    "watch": "cross-env NODE_ENV=development nodemon index.js",
+    "test": "cross-env NODE_ENV=test jest --verbose"
   },
   "repository": {
     "type": "git",
@@ -17,10 +17,13 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
+    "dotenv": "^5.0.0",
     "express": "^4.16.2",
     "mongoose": "^5.0.6"
   },
   "devDependencies": {
-    "jest": "^22.3.0"
+    "cross-env": "^5.1.3",
+    "jest": "^22.3.0",
+    "supertest": "^3.0.0"
   }
 }
