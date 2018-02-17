@@ -1,6 +1,4 @@
-const dummy = (blogs) => {
-	return 1
-}
+const Blog = require('../models/blog')
 
 const totalLikes = (blogs) => {
 	return arrayOfLikes(blogs).reduce((a, b) => a + b)
@@ -116,12 +114,17 @@ const listOfBlogs = [
   }  
 ]
 
+const blogsInDb = async () => {
+  const blogs = await Blog.find({})
+  return blogs
+}
+
 module.exports = {
-  dummy,
   totalLikes,
   listOfBlogs,
   mostLikes,
   listWithOneBlog,
   authorOfMostBlogs,
-  mostLikedAuthor
+  mostLikedAuthor,
+  blogsInDb
 }

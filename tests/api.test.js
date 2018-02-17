@@ -2,21 +2,16 @@ const supertest = require('supertest')
 const {app, server} = require('../index')
 const api = supertest(app)
 const Blog = require('../models/blog')
-const listHelper = require('../utils/for_testing')
+const helper = require('../utils/for_testing')
 
-const initialBlogs = listHelper.listOfBlogs
 
-beforeAll(async () => {
-  await Blog.remove({})
+describe('GET /api/blogs', () => {
 
-  let blogObject = new Blog(initialBlogs[0])
-  await blogObject.save()
-
-  blogObject = new Blog(initialBlogs[1])
-  await blogObject.save()
-})
-
-describe('when GET-request', () => {
+  beforeAll(async () => {
+    await Blog.remove({})
+    await (new Blog(helper.listOfBlogs[0])).save()
+    await (new Blog(helper.listOfBlogs[1])).save()
+  })
 
   test('blogs are returned as json', async () => {
     await api
@@ -28,28 +23,29 @@ describe('when GET-request', () => {
   test('there are two blogs', async () => {
     const response = await api
       .get('/api/blogs')
-
     expect(response.body.length).toBe(2)
   })
 
   test('the first blog is by Michael Chan', async () => {
     const response = await api
       .get('/api/blogs')
-
-    expect(response.body[0].author).toBe(initialBlogs[0].author)
+    expect(response.body[0].author).toBe(helper.listOfBlogs[0].author)
   })
-
 })
 
-describe('when POST-request', () => {
+describe('POST /api/blogs', () => {
+
+  beforeEach(async () => await Blog.remove({}))
 
   test('a valid blog can be added ', async () => {
     const newBlog = {
-    title: "testiblogi",
-    author: "testaaja",
-    url: "http://testi",
-    likes: 0
-  }
+      title: "testiblogi",
+      author: "testaaja",
+      url: "http://testi",
+      likes: 0
+    }
+
+    const blogsBefore = await helper.blogsInDb()
 
     await api
       .post('/api/blogs')
@@ -57,20 +53,23 @@ describe('when POST-request', () => {
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
+    const blogsAfter = await helper.blogsInDb()
     const response = await api
       .get('/api/blogs')
 
-    expect(response.body.length).toBe(3)
-    expect(response.body[2].title).toBe("testiblogi")
+    expect(blogsAfter.length).toBe(blogsBefore.length + 1)
+    expect(response.body[0].title).toBe(newBlog.title)
   })
 
   test('an invalid blog cannot be added ', async () => {
     const newBlog = {
-    title: "testiblogi",
-    author: "testaaja",
-    //url: "http://testi",
-    likes: 0
-  }
+      title: "testiblogi",
+      author: "testaaja",
+      //url: "http://testi",
+      likes: 0
+    }
+
+    const blogsBefore = await helper.blogsInDb()
 
     await api
       .post('/api/blogs')
@@ -78,15 +77,19 @@ describe('when POST-request', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
+    const blogsAfter = await helper.blogsInDb()
+    expect(blogsAfter.length).toBe(blogsBefore.length)
   })
 
   test('a blog without likes is saved and likes are set to zero', async () => {
     const newBlog = {
-    title: "testiblogi",
-    author: "testaaja",
-    url: "http://testi"
-    //likes: 0
+      title: "testiblogi",
+      author: "testaaja",
+      url: "http://testi"
+      //likes: 0
     }
+
+    const blogsBefore = await helper.blogsInDb()
 
     await api
       .post('/api/blogs')
@@ -94,14 +97,13 @@ describe('when POST-request', () => {
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
+    const blogsAfter = await helper.blogsInDb()
     const response = await api
       .get('/api/blogs')
 
-    expect(response.body.length).toBe(4)
-    expect(response.body[2].likes).toBe(0)
-
+    expect(blogsAfter.length).toBe(blogsBefore.length + 1)
+    expect(response.body[0].likes).toBe(0)
   })  
-
 })
 
 afterAll(() => {
