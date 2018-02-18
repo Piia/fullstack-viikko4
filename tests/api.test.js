@@ -2,15 +2,17 @@ const supertest = require('supertest')
 const {app, server} = require('../index')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('../utils/for_testing')
 
 
-describe('GET /api/blogs', () => {
+describe('GET /api/blogs', async () => {
 
   beforeAll(async () => {
     await Blog.remove({})
-    await (new Blog(helper.listOfBlogs[0])).save()
-    await (new Blog(helper.listOfBlogs[1])).save()
+    const promise1 = (new Blog(helper.listOfBlogs[0])).save()
+    const promise2 = (new Blog(helper.listOfBlogs[1])).save()
+    await Promise.all([promise1, promise2])
   })
 
   test('blogs are returned as json', async () => {
@@ -33,9 +35,11 @@ describe('GET /api/blogs', () => {
   })
 })
 
-describe('POST /api/blogs', () => {
+describe('POST /api/blogs', async () => {
 
-  beforeEach(async () => await Blog.remove({}))
+  beforeEach(async () => {
+    await Blog.remove({})
+  })
 
   test('a valid blog can be added ', async () => {
     const newBlog = {

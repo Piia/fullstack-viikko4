@@ -1,4 +1,6 @@
 const Blog = require('../models/blog')
+const User = require('../models/user')
+
 
 const totalLikes = (blogs) => {
 	return arrayOfLikes(blogs).reduce((a, b) => a + b)
@@ -119,6 +121,32 @@ const blogsInDb = async () => {
   return blogs
 }
 
+const usersInDb = async () => {
+  const users = await User.find({})
+  return users
+}
+
+const listOfUsers = [
+	{
+		name: "Test User 1",
+		username: "Test User 1",
+		password: "Test User 1",
+		adult: false
+	},
+	{
+		name: "Test User 2",
+		username: "Test User 2",
+		password: "Test User 2",
+		adult: true
+	},
+	{
+		name: "Test User 3",
+		username: "Test User 3",
+		password: "Test User 3",
+		adult: true
+	}
+]
+
 module.exports = {
   totalLikes,
   listOfBlogs,
@@ -126,5 +154,7 @@ module.exports = {
   listWithOneBlog,
   authorOfMostBlogs,
   mostLikedAuthor,
-  blogsInDb
+  blogsInDb, 
+  listOfUsers,
+  usersInDb
 }
